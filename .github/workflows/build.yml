@@ -10,6 +10,12 @@ jobs:
         working-directory: "pureza-mobile (1)/pureza-mobile"
     steps:
       - uses: actions/checkout@v4
+      - name: Aplicar actualizacion
+        working-directory: .
+        run: |
+          if [ -d "actualizacion-pureza/pureza-mobile (1)/pureza-mobile" ]; then
+            cp -r "actualizacion-pureza/pureza-mobile (1)/pureza-mobile/." "pureza-mobile (1)/pureza-mobile/"
+          fi
       - uses: actions/setup-node@v4
         with: { node-version: 20 }
       - uses: actions/setup-java@v4
