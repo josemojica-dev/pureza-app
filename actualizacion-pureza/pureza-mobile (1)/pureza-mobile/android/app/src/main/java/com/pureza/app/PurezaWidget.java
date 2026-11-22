@@ -72,7 +72,7 @@ public class PurezaWidget extends AppWidgetProvider {
     static void marcarHoy(Context c) {
         try {
             JSONObject db = parse(c);
-            if (recaidaHoy(db)) return;
+            if (baseMs(db) <= 0 || recaidaHoy(db)) return;
             JSONObject chk = db.optJSONObject("checkins");
             if (chk == null) {
                 chk = new JSONObject();
@@ -124,8 +124,13 @@ public class PurezaWidget extends AppWidgetProvider {
         Intent urge = new Intent(c, MainActivity.class).putExtra("accion", "urge");
         v.setOnClickPendingIntent(R.id.w_btn, PendingIntent.getActivity(c, 1, urge, flags));
 
-        Intent marcar = new Intent(c, PurezaWidget.class).setAction(ACCION_MARCAR);
-        v.setOnClickPendingIntent(R.id.w_btn2, PendingIntent.getBroadcast(c, 2, marcar, flags));
+        if (baseMs(db) <= 0) {
+            // Aún no hay datos: abre la app para que se sincronice.
+            v.setOnClickPendingIntent(R.id.w_btn2, PendingIntent.getActivity(c, 3, open, flags));
+        } else {
+            Intent marcar = new Intent(c, PurezaWidget.class).setAction(ACCION_MARCAR);
+            v.setOnClickPendingIntent(R.id.w_btn2, PendingIntent.getBroadcast(c, 2, marcar, flags));
+        }
 
         mgr.updateAppWidget(id, v);
     }

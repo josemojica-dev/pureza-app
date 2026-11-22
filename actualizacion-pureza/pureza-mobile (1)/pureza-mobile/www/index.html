@@ -156,13 +156,40 @@ summary{cursor:pointer;font-size:13px;color:#a5a5ff;padding:6px 0}
  </details>
 </div>
 
+<p id="conexion" class="muted" style="text-align:center;margin-top:6px"></p>
 <button onclick="borrar()" style="width:100%;background:none;border:none;color:#3a3a4a;padding:12px;font-size:12px">Borrar datos</button>
 </div>
 
 <div class="overlay" id="ov"><div class="box" id="ovBox"></div></div>
 
 <script>
-var Native = (window.Capacitor && Capacitor.registerPlugin && Capacitor.isNativePlatform && Capacitor.isNativePlatform()) ? Capacitor.registerPlugin('Pureza') : null;
+var MODO='ninguno';
+var Native = conectarNativo();
+function conectarNativo(){
+ try{
+  var C=window.Capacitor;
+  var android = !!window.androidBridge || !!(C && C.getPlatform && C.getPlatform()==='android') || !!(C && C.isNativePlatform && C.isNativePlatform());
+  if(android && C){
+   if(C.Plugins && C.Plugins.Pureza){ MODO='plugin'; return C.Plugins.Pureza; }
+   if(C.registerPlugin){ try{ var pl=C.registerPlugin('Pureza'); if(pl){ MODO='plugin'; return pl; } }catch(e){} }
+  }
+  if(window.PurezaNative){
+   MODO='interfaz';
+   return {
+    get:function(){ return Promise.resolve({db:PurezaNative.get()}); },
+    set:function(o){ PurezaNative.set((o&&o.db)||''); return Promise.resolve(); },
+    getSteps:function(){ try{ return Promise.resolve(JSON.parse(PurezaNative.steps())); }catch(e){ return Promise.resolve({mapa:{},hoy:0}); } },
+    consumeLaunch:function(){ var a=PurezaNative.consumeLaunch(); return Promise.resolve({accion:a||null}); }
+   };
+  }
+  if(android && C && C.nativePromise){
+   MODO='puente';
+   var np=function(m,o){ return C.nativePromise('Pureza',m,o||{}); };
+   return { get:function(){return np('get');}, set:function(o){return np('set',o);}, getSteps:function(){return np('getSteps');}, consumeLaunch:function(){return np('consumeLaunch');} };
+  }
+ }catch(e){}
+ return null;
+}
 
 var HITOS = [1,3,7,14,21,30,60,90,180,365];
 var PREMIOS_DEF = {1:"5 minutos de respiración profunda con tu música favorita",3:"Una caminata tranquila, sin prisa y sin celular",7:"Una tarde de descanso: sin pendientes ni pantallas",14:"Una ducha o baño largo y tibio, con calma",21:"Una meditación guiada o estiramientos suaves",30:"Un día entero sin obligaciones, solo lo que te relaje",60:"Un paseo largo en la naturaleza o un lugar que te dé paz",90:"Un fin de semana de desconexión: sin redes y sin prisa",180:"Un día de silencio y descanso total, solo para ti",365:"Un viaje o un día especial dedicado a tu paz"};
@@ -438,6 +465,7 @@ function esc(s){ return String(s).replace(/[&<>"']/g,function(c){return {'&':'&a
 
 function render(){
  flushMig();
+ document.getElementById('conexion').innerText = Native ? 'Conexión con el widget: activa ✓' : 'Conexión con el widget: no disponible';
  var hoy=key(new Date());
  var r=calcRacha();
  if(r>db.mejorRacha){ db.mejorRacha=r; save(); }
@@ -552,8 +580,19 @@ function acciones(){
 function pullNative(){
  if(!Native){ render(); return; }
  Native.get().then(function(res){
-  if(res && res.db){ try{ db=merge(JSON.parse(res.db)); localStorage.setItem('purezaDB',JSON.stringify(db)); }catch(e){} }
-  else if(localStorage.getItem('purezaDB')){ Native.set({db:localStorage.getItem('purezaDB')}).catch(function(){}); }
+  var nat=null, loc=null;
+  try{ nat = res && res.db ? JSON.parse(res.db) : null; }catch(e){}
+  try{ loc = JSON.parse(localStorage.getItem('purezaDB')||'null'); }catch(e){}
+  var natOk = nat && (nat.inicio || nat.ultimaMs);
+  if(natOk){
+   db=merge(nat);
+   try{ localStorage.setItem('purezaDB',JSON.stringify(db)); }catch(e){}
+  } else if(loc){
+   // la base nativa está vacía (o solo tiene marcas del widget): se conservan tus datos y se envían al widget
+   db=merge(loc);
+   if(nat && nat.checkins){ Object.keys(nat.checkins).forEach(function(k){ db.checkins[k]=true; }); }
+   db._m=true;
+  }
   render(); pedirPasos(); acciones();
  }).catch(render);
 }
