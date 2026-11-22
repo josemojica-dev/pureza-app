@@ -1,0 +1,566 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#0f0f0f">
+<title>Pureza</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:-apple-system,BlinkMacSystemFont,Segoe UI,sans-serif}
+body{background:#0a0a0f;color:white;min-height:100vh;display:flex;justify-content:center;padding:15px;padding-top:calc(15px + env(safe-area-inset-top));padding-bottom:calc(15px + env(safe-area-inset-bottom))}
+.app{width:100%;max-width:420px}
+.card{background:#18181f;border-radius:24px;padding:22px;margin-bottom:14px;border:1px solid #2a2a35}
+h1{text-align:center;font-size:19px;letter-spacing:1px}
+h2{font-size:14px;margin-bottom:4px}
+.sub{text-align:center;color:#6b6b80;font-size:12px;margin-top:4px}
+.muted{color:#6b6b80;font-size:12px;line-height:1.4}
+.racha{text-align:center;padding:18px 0}
+#num{font-size:88px;font-weight:900;line-height:.9;background:linear-gradient(180deg,#fff 0%,#a5a5ff 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+#label{color:#8b8ba7;font-size:12px;letter-spacing:3px;margin-top:8px}
+#last{margin-top:14px;background:#23232f;border-radius:12px;padding:10px;font-size:13px;color:#9a9ab3}
+.btn{width:100%;padding:16px;border-radius:16px;border:none;font-size:15px;font-weight:700;cursor:pointer;margin-top:10px;color:white}
+.btn-urge{background:linear-gradient(135deg,#0ea5a4,#2563eb)}
+.btn-relapse{background:#2a2a35;color:#ff8da1}
+.btn-main{background:linear-gradient(135deg,#5b5bff,#8b5cf6)}
+.btn-ghost{background:#2a2a35;color:#8b8ba7}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:14px}
+.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:14px}
+.mini{background:#23232f;border-radius:14px;padding:14px 8px;text-align:center}
+.mini b{font-size:21px;display:block}
+.mini span{font-size:10px;color:#6b6b80}
+.cal{display:grid;grid-template-columns:repeat(7,1fr);gap:6px;margin-top:12px}
+.cal div{aspect-ratio:1;background:#23232f;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:12px;color:#6b6b80}
+.cal .clean{background:#2e2e4a;color:#a5a5ff;border:1px solid #3d3d5c}
+.cal .fail{background:#3a232f;color:#ff8da1}
+.cal .hoy{outline:2px solid white;outline-offset:-2px}
+.cal .chk{border:1px solid #7dffb0;color:#7dffb0}
+#last{cursor:pointer}
+.btn:disabled{opacity:.7}
+input[type=datetime-local]{width:100%;background:#23232f;border:1px solid #2a2a35;border-radius:12px;color:white;padding:12px;font-size:14px;margin-top:10px}
+.motiv{text-align:center;font-size:13px;color:#a5a5ff;margin-top:12px;line-height:1.4}
+.banner{background:#3a2a1f;border:1px solid #6b4a2a;border-radius:16px;padding:14px;margin-bottom:14px;font-size:13px;line-height:1.4;color:#ffd2a1}
+.banner button{margin-top:10px;width:100%;padding:12px;border:none;border-radius:12px;background:#f59e0b;color:#1a1204;font-weight:700;font-size:14px}
+.moods{display:flex;justify-content:space-between;margin-top:12px}
+.moods button{flex:1;margin:0 3px;padding:12px 0;font-size:24px;background:#23232f;border:2px solid transparent;border-radius:14px}
+.moods button.sel{border-color:#a5a5ff;background:#2e2e4a}
+.bars{display:flex;align-items:flex-end;gap:6px;height:70px;margin-top:12px}
+.bars div{flex:1;background:#2e2e4a;border-radius:6px 6px 0 0;min-height:3px}
+.bars div.hoy{background:#8b5cf6}
+.bars-l{display:flex;gap:6px;margin-top:4px}
+.bars-l span{flex:1;text-align:center;font-size:10px;color:#6b6b80}
+.premio{display:flex;align-items:center;gap:12px;background:#23232f;border-radius:14px;padding:12px;margin-top:8px;font-size:13px}
+.premio.lock{opacity:.5}
+.premio .d{min-width:46px;text-align:center;font-weight:800;color:#a5a5ff}
+.premio.ok .d{color:#7dffb0}
+textarea,input[type=date],input[type=number]{width:100%;background:#23232f;border:1px solid #2a2a35;border-radius:12px;color:white;padding:10px;font-size:13px;margin-top:6px}
+textarea{min-height:110px}
+details{margin-top:6px}
+summary{cursor:pointer;font-size:13px;color:#a5a5ff;padding:6px 0}
+.overlay{position:fixed;inset:0;background:rgba(5,5,10,.92);display:none;align-items:center;justify-content:center;padding:20px;z-index:10}
+.overlay.on{display:flex}
+.box{background:#18181f;border:1px solid #2a2a35;border-radius:24px;padding:24px;width:100%;max-width:380px;max-height:90vh;overflow:auto;text-align:center}
+.box h3{font-size:20px;margin-bottom:10px}
+.box p{font-size:14px;color:#c4c4d6;line-height:1.5}
+.opts{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:14px}
+.opts button{padding:12px 6px;border-radius:12px;border:1px solid #2a2a35;background:#23232f;color:white;font-size:13px}
+.big{font-size:56px;font-weight:800;margin:8px 0}
+.breath{font-size:18px;color:#7dd3fc;margin:10px 0;min-height:26px}
+.tip{font-size:13px;color:#c4c4d6;background:#23232f;border-radius:12px;padding:10px;margin-top:8px;text-align:left}
+</style>
+</head>
+<body>
+<div class="app">
+
+<div id="pendiente"></div>
+
+<div class="card">
+ <h1>🤍 PUREZA</h1>
+ <p class="sub">Tu progreso privado</p>
+ <div class="racha">
+  <div id="num">0</div>
+  <div id="label">DÍAS LIMPIO</div>
+  <div id="last" onclick="editarUltima()">Última vez: Nunca</div>
+  <div id="tiempo" class="muted" style="margin-top:8px"></div>
+ </div>
+ <div id="motiv" class="motiv">Hoy es un buen día para empezar.</div>
+ <div id="proximo" class="motiv" style="color:#7dffb0;margin-top:6px"></div>
+ <button class="btn btn-main" id="btnMarcar" onclick="marcarHoy()">✓ Marcar hoy como día limpio</button>
+ <p class="muted" style="text-align:center;margin-top:8px">Aunque no lo marques, tus días limpios cuentan solos.</p>
+</div>
+
+<div class="card">
+ <button class="btn btn-urge" onclick="abrirImpulso()">🆘 TENGO GANAS DE RECAER</button>
+ <p class="muted" style="text-align:center;margin-top:8px">Te acompaño 10 minutos. Las ganas bajan solas.</p>
+ <button class="btn btn-ghost" onclick="abrirMeditacion()">🧘 Meditar un rato</button>
+ <button class="btn btn-relapse" onclick="recaida()">Tuve una recaída hoy</button>
+ <p class="muted" style="text-align:center;margin-top:10px">Los días sin recaída cuentan solos. Solo registra si recaes.</p>
+ <div class="grid3">
+  <div class="mini"><b id="best">0</b><span>MEJOR RACHA</span></div>
+  <div class="mini"><b id="totalClean">0</b><span>DÍAS LIMPIOS</span></div>
+  <div class="mini"><b id="urgesWon">0</b><span>IMPULSOS VENCIDOS</span></div>
+ </div>
+</div>
+
+<div class="card">
+ <h2>¿Cómo te sientes hoy?</h2>
+ <p class="muted">Un toque al día. Con esto la app compara tu ánimo con tus pasos y tu racha.</p>
+ <div class="moods" id="moods"></div>
+ <p class="muted" id="animoTip" style="margin-top:12px"></p>
+</div>
+
+<div class="card">
+ <h2>🌱 Mi madurez</h2>
+ <div id="madBox"></div>
+</div>
+
+<div class="card">
+ <h2>👟 Pasos</h2>
+ <div id="stepsBox"></div>
+</div>
+
+<div class="card">
+ <h2>🎁 Premios para tu calma</h2>
+ <p class="muted">Se desbloquean solos al llegar a cada meta. Son cosas que te hacen sentir en paz y equilibran tu ánimo.</p>
+ <div id="premios"></div>
+</div>
+
+<div class="card">
+ <div style="display:flex;justify-content:space-between;font-size:13px"><b>Últimos 28 días</b><span style="color:#6b6b80">Morado = limpio · borde verde = marcado</span></div>
+ <div class="cal" id="cal"></div>
+ <div id="detonantes" class="muted" style="margin-top:12px"></div>
+</div>
+
+<div class="card">
+ <h2>⚙️ Personalizar</h2>
+ <details>
+  <summary>Mis premios por meta</summary>
+  <p class="muted">Cosas que te calmen y te hagan sentir bien. Un premio por línea, con el formato <b>días: premio</b>. Ejemplo: 7: Una tarde tranquila sin pantallas</p>
+  <textarea id="edPremios"></textarea>
+  <button class="btn btn-main" onclick="guardarPremios()">Guardar premios</button>
+ </details>
+ <details>
+  <summary>Mis consecuencias si recaigo</summary>
+  <p class="muted">Una por línea. Que te ayuden a recuperar el control: meditar, estar sin celular, escribir. No para sufrir.</p>
+  <textarea id="edCons"></textarea>
+  <button class="btn btn-main" onclick="guardarCons()">Guardar consecuencias</button>
+ </details>
+ <details>
+  <summary>Meta diaria de pasos</summary>
+  <input type="number" id="edMeta" min="1000" step="500">
+  <button class="btn btn-main" onclick="guardarMeta()">Guardar meta</button>
+ </details>
+ <details>
+  <summary>Cambiar mi última recaída (fecha y hora)</summary>
+  <p class="muted">La racha se recalcula desde la fecha y hora que pongas.</p>
+  <button class="btn btn-main" onclick="editarUltima()">Editar fecha y hora</button>
+ </details>
+</div>
+
+<button onclick="borrar()" style="width:100%;background:none;border:none;color:#3a3a4a;padding:12px;font-size:12px">Borrar datos</button>
+</div>
+
+<div class="overlay" id="ov"><div class="box" id="ovBox"></div></div>
+
+<script>
+var Native = (window.Capacitor && Capacitor.registerPlugin && Capacitor.isNativePlatform && Capacitor.isNativePlatform()) ? Capacitor.registerPlugin('Pureza') : null;
+
+var HITOS = [1,3,7,14,21,30,60,90,180,365];
+var PREMIOS_DEF = {1:"5 minutos de respiración profunda con tu música favorita",3:"Una caminata tranquila, sin prisa y sin celular",7:"Una tarde de descanso: sin pendientes ni pantallas",14:"Una ducha o baño largo y tibio, con calma",21:"Una meditación guiada o estiramientos suaves",30:"Un día entero sin obligaciones, solo lo que te relaje",60:"Un paseo largo en la naturaleza o un lugar que te dé paz",90:"Un fin de semana de desconexión: sin redes y sin prisa",180:"Un día de silencio y descanso total, solo para ti",365:"Un viaje o un día especial dedicado a tu paz"};
+var OLD_PREMIOS = {1:"Un helado o tu bebida favorita",3:"Tu comida favorita",7:"Una salida o un antojo",14:"Algo pequeño que quieras comprarte",21:"Una tarde libre solo para ti",30:"Un regalo que llevas tiempo queriendo",60:"Una experiencia: cine, concierto o viaje corto",90:"Algo grande que te hayas ganado",180:"Un premio especial",365:"Celébralo a lo grande"};
+var CONS_DEF = ["Meditar 15 minutos en silencio, sin celular","2 horas sin mirar el celular (déjalo en otra habitación)","Esta noche el celular se queda fuera de tu cuarto","Meditar 10 minutos y escribir qué la disparó","Sin redes sociales el resto del día","Caminar 30 minutos sin celular","Escribir 3 cosas por las que estás agradecido y 1 cosa que harás distinto"];
+var OLD_CONS = ["20 flexiones o 15 minutos de ejercicio ahora","Caminar 30 minutos","Escribir qué la disparó y qué harás distinto","Ordenar y limpiar un espacio de tu casa por 20 minutos","Esta noche el celular se queda cargando fuera de tu cama","Sin redes sociales el resto del día","Escribir 3 cosas por las que estás agradecido"];
+var DETONANTES = ["Aburrimiento","Estrés","Soledad","De noche / en la cama","Redes sociales","Otro"];
+var EMOJIS = ["😞","😕","😐","🙂","😄"];
+var TIPS = ["Sal de la habitación donde estás ahora.","Toma un vaso de agua grande.","Haz 20 flexiones o sentadillas.","Camina afuera 10 minutos.","Escríbele o llama a alguien de confianza.","Date una ducha tibia y cambia de ropa.","Deja el celular lejos de ti."];
+
+var EMPTY = {dias:{},mejorRacha:0,ultimaRecaida:null,inicio:null,recaidas:[],animo:{},impulsos:{},impulsosGanados:0,premiosVistos:[],consecuencias:null,premios:null,metaPasos:6000,pendiente:null,nacimiento:null,ultimaMs:null,ultimaKey:null,checkins:{},meditaciones:0,v:0};
+var db = load();
+var pasosMap = {};
+
+function load(){
+ var o = {};
+ try{ o = JSON.parse(localStorage.getItem('purezaDB')||'{}'); }catch(e){}
+ return merge(o);
+}
+function merge(o){
+ var d = JSON.parse(JSON.stringify(EMPTY));
+ for(var k in o){ d[k]=o[k]; }
+ if(!d.checkins) d.checkins={};
+ if(!d.consecuencias) d.consecuencias = CONS_DEF.slice();
+ if(!d.premios) d.premios = JSON.parse(JSON.stringify(PREMIOS_DEF));
+ migrar(d,o);
+ return d;
+}
+// Migración a la versión 4 (se hace una sola vez)
+function migrar(d,o){
+ if(o && o.v>=2) return;
+ d._m=true; d.v=2;
+ // tu última recaída real: 20 nov 2026, 11:53 p.m. (solo si aún no había ninguna registrada)
+ var preset=false;
+ if(!d.ultimaMs){
+  if(o && o.ultimaRecaida){ var t=Date.parse(o.ultimaRecaida); if(!isNaN(t)) d.ultimaMs=t; }
+  else if(o && o.inicio){ d.ultimaMs=new Date(2026,10,20,23,53).getTime(); preset=true; }
+ }
+ if(d.ultimaMs){
+  var k=key(new Date(d.ultimaMs));
+  if(!d.ultimaKey) d.ultimaKey=k;
+  if(preset){ d.dias[k]='fail'; d.ultimaRecaida=new Date(d.ultimaMs).toISOString(); if(!d.inicio||d.inicio>k) d.inicio=k; d.premiosVistos=[]; }
+ }
+ // cambia los premios y consecuencias de fábrica por los nuevos (si no los habías editado)
+ if(HITOS.every(function(h){ return d.premios[h]===OLD_PREMIOS[h]; })) d.premios=JSON.parse(JSON.stringify(PREMIOS_DEF));
+ if(JSON.stringify(d.consecuencias)===JSON.stringify(OLD_CONS)) d.consecuencias=CONS_DEF.slice();
+}
+function flushMig(){ if(db._m){ delete db._m; save(); } }
+
+// Fechas locales (no UTC)
+function key(d){ return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'); }
+function dayNum(k){ var p=k.split('-'); return Date.UTC(+p[0],+p[1]-1,+p[2])/86400000; }
+function keyFromNum(n){ var d=new Date(n*86400000); return d.getUTCFullYear()+'-'+String(d.getUTCMonth()+1).padStart(2,'0')+'-'+String(d.getUTCDate()).padStart(2,'0'); }
+
+function save(){
+ var s=JSON.stringify(db);
+ localStorage.setItem('purezaDB',s);
+ if(Native) Native.set({db:s}).catch(function(){});
+}
+
+function ensureInicio(){
+ if(!db.inicio){ var ks=Object.keys(db.dias).sort(); db.inicio = ks.length ? ks[0] : key(new Date()); save(); }
+}
+
+// Todo día desde el inicio es limpio salvo que registres una recaída (hoy también).
+function estado(k){
+ if(db.dias[k]==='fail') return 'fail';
+ if(db.inicio && k>=db.inicio && k<=key(new Date())) return 'clean';
+ return null;
+}
+
+function baseMs(){
+ if(db.ultimaMs) return db.ultimaMs;
+ ensureInicio();
+ return db.inicio ? new Date(db.inicio+'T00:00:00').getTime() : null;
+}
+// Días limpios = días completos (24 h) transcurridos desde tu última recaída.
+function calcRacha(){
+ var b=baseMs(); if(!b) return 0;
+ return Math.max(0, Math.floor((Date.now()-b)/86400000));
+}
+function tiempoStr(ms){
+ var d=Math.floor(ms/864e5), h=Math.floor(ms%864e5/36e5), m=Math.floor(ms%36e5/6e4);
+ return (d? d+(d===1?' día, ':' días, '):'')+h+' h '+m+' min';
+}
+// Días completos sin recaída (el día de hoy aún no termina)
+function totalLimpios(){
+ ensureInicio();
+ var n=0, hoy=dayNum(key(new Date()));
+ for(var t=dayNum(db.inicio); t<hoy; t++){ if(estado(keyFromNum(t))==='clean') n++; }
+ return n;
+}
+function inputDT(d){ return key(d)+'T'+String(d.getHours()).padStart(2,'0')+':'+String(d.getMinutes()).padStart(2,'0'); }
+
+/* ---------- Editar última recaída ---------- */
+function editarUltima(){
+ var base=db.ultimaMs||Date.now();
+ showBox('<h3>Última recaída</h3><p>Pon la fecha y la hora de tu última vez. Tu racha se calcula desde ahí.</p><input type="datetime-local" id="edUlt" value="'+inputDT(new Date(base))+'" max="'+inputDT(new Date())+'"><button class="btn btn-main" onclick="aplicarUltima()">Guardar</button><button class="btn btn-ghost" onclick="closeBox()">Cancelar</button>');
+}
+function aplicarUltima(){
+ var v=document.getElementById('edUlt').value;
+ if(!v){ alert('Elige fecha y hora'); return; }
+ var t=new Date(v).getTime();
+ if(isNaN(t)||t>Date.now()){ alert('La fecha no puede ser futura'); return; }
+ var k=key(new Date(t));
+ Object.keys(db.dias).forEach(function(x){ if(db.dias[x]==='fail' && (x===db.ultimaKey || x>k)) delete db.dias[x]; });
+ db.dias[k]='fail'; db.ultimaKey=k; db.ultimaMs=t; db.ultimaRecaida=new Date(t).toISOString();
+ if(!db.inicio||db.inicio>k) db.inicio=k;
+ db.premiosVistos=HITOS.filter(function(m){ return m<=calcRacha(); });
+ save(); closeBox(); render();
+}
+
+/* ---------- Marcar el día como limpio ---------- */
+function marcarHoy(){
+ var hoy=key(new Date());
+ if(db.dias[hoy]==='fail'){ alert('Hoy registraste una recaída. Mañana empieza de nuevo.'); return; }
+ db.checkins[hoy]=true; save(); render();
+}
+
+/* ---------- Ventanas ---------- */
+function showBox(html){ document.getElementById('ovBox').innerHTML=html; document.getElementById('ov').classList.add('on'); }
+function closeBox(){ document.getElementById('ov').classList.remove('on'); stopUrge(); }
+
+/* ---------- Recaída + consecuencia ---------- */
+function recaida(){
+ var h='<h3>Registrar recaída</h3><p>Una recaída no borra lo que avanzaste. Lo que importa es lo que haces ahora.<br><br><b>¿Qué la detonó?</b></p><div class="opts">';
+ DETONANTES.forEach(function(x,i){ h+='<button onclick="confirmarRecaida('+i+')">'+x+'</button>'; });
+ h+='</div><button class="btn btn-ghost" onclick="closeBox()">Cancelar</button>';
+ showBox(h);
+}
+function confirmarRecaida(i){
+ var now=new Date(), hoy=key(now);
+ var rAnt=calcRacha(); if(rAnt>db.mejorRacha) db.mejorRacha=rAnt;
+ db.dias[hoy]='fail';
+ db.ultimaKey=hoy; db.ultimaMs=now.getTime();
+ delete db.checkins[hoy];
+ db.ultimaRecaida=now.toISOString();
+ db.recaidas.push({k:hoy,h:now.getHours(),det:DETONANTES[i]});
+ db.premiosVistos=[];
+ var lista=db.consecuencias.length?db.consecuencias:CONS_DEF;
+ var c=lista[Math.floor(Math.random()*lista.length)];
+ db.pendiente={k:hoy,texto:c};
+ save(); render();
+ showBox('<h3>Tu consecuencia de hoy</h3><p style="font-size:17px;color:#fff;margin:14px 0">'+esc(c)+'</p><p>No es un castigo para sufrir: es para recuperar el control. Cúmplela y mañana empieza de nuevo.</p><button class="btn btn-main" onclick="closeBox()">Entendido</button>');
+}
+function cumplida(){ db.pendiente=null; save(); render(); }
+
+/* ---------- Impulso y meditación ---------- */
+var urgeT=null, urgeLeft=0, urgeTotal=600, urgeKind='urge';
+function abrirImpulso(){ iniciarTimer(600,'urge'); }
+function abrirMeditacion(){
+ showBox('<h3>🧘 Meditar</h3><p>Siéntate cómodo, deja el celular a un lado y sigue la respiración. ¿Cuánto tiempo?</p><div class="opts"><button onclick="iniciarTimer(300,\'med\')">5 min</button><button onclick="iniciarTimer(600,\'med\')">10 min</button><button onclick="iniciarTimer(900,\'med\')">15 min</button><button onclick="iniciarTimer(1200,\'med\')">20 min</button></div><button class="btn btn-ghost" onclick="closeBox()">Cancelar</button>');
+}
+function iniciarTimer(secs,kind){
+ stopUrge();
+ urgeTotal=secs; urgeLeft=secs; urgeKind=kind;
+ var tip=TIPS[Math.floor(Math.random()*TIPS.length)];
+ var titulo = kind==='urge' ? 'Respira. Esto pasa.' : '🧘 Meditando';
+ var texto = kind==='urge' ? 'Las ganas son una ola: suben, llegan al máximo y bajan. No tienes que pelear, solo esperar.' : 'Deja que los pensamientos pasen sin seguirlos. Solo respira.';
+ var ok = kind==='urge' ? 'Lo logré ✓' : 'Terminé ✓';
+ showBox('<h3>'+titulo+'</h3><p>'+texto+'</p><div class="big" id="urgeClock"></div><div class="breath" id="breath"></div>'+(kind==='urge'?'<div class="tip">💡 '+tip+'</div>':'')+'<button class="btn btn-main" id="urgeBtn" onclick="finTimer(true)" style="display:none">'+ok+'</button><button class="btn btn-ghost" onclick="finTimer(false)">Cerrar</button>');
+ tickUrge();
+ urgeT=setInterval(tickUrge,1000);
+}
+function tickUrge(){
+ var c=document.getElementById('urgeClock'); if(!c){ stopUrge(); return; }
+ var m=Math.floor(urgeLeft/60), s=urgeLeft%60;
+ c.innerText=m+':'+String(s).padStart(2,'0');
+ var ph=(urgeTotal-urgeLeft)%10;
+ document.getElementById('breath').innerText = ph<4 ? 'Inhala… '+(4-ph) : 'Exhala despacio… '+(10-ph);
+ if(urgeLeft<=0){ stopUrge(); c.innerText='0:00'; document.getElementById('breath').innerText = urgeKind==='urge' ? 'Ya pasó lo peor 💪' : 'Muy bien. Tómate un momento antes de seguir 🌿'; document.getElementById('urgeBtn').style.display='block'; return; }
+ urgeLeft--;
+}
+function stopUrge(){ if(urgeT){ clearInterval(urgeT); urgeT=null; } }
+function finTimer(ok){
+ if(urgeKind==='urge'){
+  var hoy=key(new Date());
+  db.impulsos[hoy]=(db.impulsos[hoy]||0)+1;
+  if(ok) db.impulsosGanados=(db.impulsosGanados||0)+1;
+ } else if(ok){
+  db.meditaciones=(db.meditaciones||0)+1;
+ }
+ save(); closeBox(); render();
+}
+
+/* ---------- Ánimo ---------- */
+function setAnimo(n){ db.animo[key(new Date())]=n; save(); render(); }
+
+/* ---------- Premios ---------- */
+function siguientePremio(r){
+ for(var i=0;i<HITOS.length;i++){ if(HITOS[i]>r) return HITOS[i]; }
+ return null;
+}
+function revisarPremios(r){
+ if(document.getElementById('ov').classList.contains('on')) return;
+ var nuevos=HITOS.filter(function(m){ return m<=r && db.premiosVistos.indexOf(m)<0; });
+ if(!nuevos.length) return;
+ var top=nuevos[nuevos.length-1];
+ HITOS.forEach(function(m){ if(m<=r && db.premiosVistos.indexOf(m)<0) db.premiosVistos.push(m); });
+ save();
+ var p=db.premios[top]||PREMIOS_DEF[top]||'¡Te lo ganaste!';
+ showBox('<h3>🎉 ¡'+top+(top===1?' día':' días')+' limpio!</h3><p>Lo lograste con tu esfuerzo. Tu premio:</p><p style="font-size:18px;color:#7dffb0;margin:14px 0"><b>'+esc(p)+'</b></p><button class="btn btn-main" onclick="closeBox()">¡Gracias!</button>');
+}
+
+/* ---------- Madurez (desde tu fecha de nacimiento) ---------- */
+function edadExacta(nac){
+ var p=nac.split('-').map(Number), h=new Date();
+ var y=h.getFullYear()-p[0], m=(h.getMonth()+1)-p[1], d=h.getDate()-p[2];
+ if(d<0){ m--; d+=new Date(h.getFullYear(),h.getMonth(),0).getDate(); }
+ if(m<0){ y--; m+=12; }
+ return {y:y,m:m,d:d};
+}
+function renderMadurez(){
+ var box=document.getElementById('madBox');
+ if(!db.nacimiento){
+  box.innerHTML='<p class="muted">Pon tu fecha de nacimiento y la app cuenta tus días de vida y tus días de madurez (desde que cumpliste 18).</p><input type="date" id="edNac"><button class="btn btn-main" onclick="guardarNac()">Guardar</button>';
+  return;
+ }
+ var hoy=dayNum(key(new Date())), nac=dayNum(db.nacimiento), e=edadExacta(db.nacimiento);
+ var vividos=hoy-nac;
+ var p=db.nacimiento.split('-').map(Number);
+ var m18=Date.UTC(p[0]+18,p[1]-1,p[2])/86400000;
+ var mad=hoy-m18;
+ var h='<div class="grid2"><div class="mini"><b>'+vividos.toLocaleString('es-MX')+'</b><span>DÍAS DE VIDA</span></div>';
+ h+='<div class="mini"><b>'+(mad>=0?mad.toLocaleString('es-MX'):'—')+'</b><span>DÍAS DE MADUREZ</span></div></div>';
+ h+='<p class="muted" style="margin-top:10px;text-align:center">Tienes '+e.y+' años, '+e.m+' meses y '+e.d+' días'+(mad<0?'. Tus días de madurez empiezan a los 18.':'.')+'</p>';
+ h+='<details><summary>Cambiar fecha</summary><input type="date" id="edNac" value="'+db.nacimiento+'"><button class="btn btn-main" onclick="guardarNac()">Guardar</button></details>';
+ box.innerHTML=h;
+}
+function guardarNac(){
+ var f=document.getElementById('edNac').value;
+ if(!f){ alert('Elige una fecha'); return; }
+ if(f>key(new Date())){ alert('La fecha no puede ser futura'); return; }
+ db.nacimiento=f; save(); renderMadurez();
+}
+
+/* ---------- Pasos ---------- */
+function pasosHoy(){ return pasosMap[key(new Date())]||0; }
+function pedirPasos(){
+ if(!Native) return;
+ Native.getSteps({}).then(function(res){ pasosMap=res.mapa||{}; renderPasos(); render(); }).catch(function(){ renderPasos(); });
+}
+function renderPasos(){
+ var box=document.getElementById('stepsBox');
+ if(!Native){ box.innerHTML='<p class="muted">El contador de pasos funciona en la app del teléfono.</p>'; return; }
+ var hoy=pasosHoy(), meta=db.metaPasos||6000;
+ var h='<div class="grid2"><div class="mini"><b>'+hoy.toLocaleString('es-MX')+'</b><span>PASOS HOY</span></div><div class="mini"><b>'+Math.min(100,Math.round(hoy*100/meta))+'%</b><span>DE TU META ('+meta.toLocaleString('es-MX')+')</span></div></div>';
+ var vals=[], lab=[], max=meta;
+ for(var i=6;i>=0;i--){ var d=new Date(); d.setDate(d.getDate()-i); var v=pasosMap[key(d)]||0; vals.push(v); lab.push(['D','L','M','M','J','V','S'][d.getDay()]); if(v>max) max=v; }
+ h+='<div class="bars">'; vals.forEach(function(v,i){ h+='<div class="'+(i===6?'hoy':'')+'" style="height:'+Math.max(3,Math.round(v*100/max))+'%"></div>'; }); h+='</div>';
+ h+='<div class="bars-l">'; lab.forEach(function(l){ h+='<span>'+l+'</span>'; }); h+='</div>';
+ h+='<p class="muted" style="margin-top:10px">'+insightAnimo()+'</p>';
+ h+='<p class="muted" style="margin-top:8px">Los pasos se cuentan solos con el sensor del teléfono. Abre la app o deja el widget para que se actualicen.</p>';
+ box.innerHTML=h;
+}
+// Compara ánimo y pasos (autorreporte; no es un diagnóstico)
+function insightAnimo(){
+ var meta=db.metaPasos||6000, a=[], b=[];
+ Object.keys(db.animo).forEach(function(k){ if(pasosMap[k]===undefined) return; (pasosMap[k]>=meta?a:b).push(db.animo[k]); });
+ var avg=function(x){ return x.reduce(function(s,v){return s+v},0)/x.length; };
+ if(a.length>=3 && b.length>=3){
+  var pa=avg(a), pb=avg(b);
+  if(pa-pb>=0.4) return 'Tus días de '+meta.toLocaleString('es-MX')+'+ pasos tu ánimo promedia '+pa.toFixed(1)+'/5, contra '+pb.toFixed(1)+' los demás días. Moverte te ayuda.';
+  if(pb-pa>=0.4) return 'Por ahora tu ánimo no sube con más pasos ('+pa.toFixed(1)+' vs '+pb.toFixed(1)+'). Sigue registrando para ver más datos.';
+  return 'Tu ánimo se parece en días de mucho y poco movimiento ('+pa.toFixed(1)+' vs '+pb.toFixed(1)+').';
+ }
+ var n=Object.keys(db.animo).length;
+ return 'Registra tu ánimo unos días más ('+n+' de 7) y te muestro cómo se relaciona con tus pasos.';
+}
+
+/* ---------- Render ---------- */
+function esc(s){ return String(s).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]}); }
+
+function render(){
+ flushMig();
+ var hoy=key(new Date());
+ var r=calcRacha();
+ if(r>db.mejorRacha){ db.mejorRacha=r; save(); }
+
+ document.getElementById('num').innerText=r;
+ document.getElementById('best').innerText=db.mejorRacha;
+ document.getElementById('totalClean').innerText=totalLimpios();
+ document.getElementById('urgesWon').innerText=db.impulsosGanados||0;
+
+ if(db.ultimaMs){
+  var d=new Date(db.ultimaMs);
+  document.getElementById('last').innerText='Última vez: '+d.toLocaleDateString('es-MX',{day:'2-digit',month:'short',year:'numeric'})+' a las '+d.toLocaleTimeString('es-MX',{hour:'2-digit',minute:'2-digit'})+'  ✏️';
+  document.getElementById('tiempo').innerText='Llevas '+tiempoStr(Date.now()-db.ultimaMs)+' sin recaer';
+ } else {
+  document.getElementById('last').innerText='Última vez: Nunca registrado 🤍  ✏️ toca para poner fecha';
+  var b0=baseMs(); document.getElementById('tiempo').innerText = b0 ? 'Llevas '+tiempoStr(Date.now()-b0)+' contando' : '';
+ }
+
+ // marcar el día
+ var bm=document.getElementById('btnMarcar');
+ if(db.dias[hoy]==='fail'){ bm.innerText='💙 Hoy fue difícil. Mañana empieza de nuevo'; bm.className='btn btn-ghost'; bm.disabled=true; }
+ else if(db.checkins[hoy]){ bm.innerText='✅ Hoy ya lo marcaste'; bm.className='btn btn-ghost'; bm.disabled=true; }
+ else { bm.innerText='✓ Marcar hoy como día limpio'; bm.className='btn btn-main'; bm.disabled=false; }
+
+ // consejo según el ánimo
+ var am=db.animo[hoy], atip='';
+ if(am===1||am===2) atip='Hoy tu ánimo está bajo. Prueba algo que te calme: 5 minutos de respiración, una caminata sin celular o una ducha tibia.';
+ else if(am===3) atip='Ánimo neutral. Música suave o un paseo tranquilo pueden subirlo un poco.';
+ else if(am>=4) atip='¡Qué bien! Aprovecha para hacer algo que disfrutes con calma.';
+ document.getElementById('animoTip').innerText=atip;
+
+ var frases=["Día 0: el más difícil y el más valiente.","Día 1: ya rompiste el ciclo.","Día 2: tu mente se está limpiando.","Día 3-6: aquí se forma la disciplina.","Día 7: una semana, pocos llegan.","Día 14: dos semanas, tu mejor versión aparece.","Día 30: un mes, eres otra persona."];
+ document.getElementById('motiv').innerText = r>=30?frases[6]:r>=14?frases[5]:r>=7?frases[4]:r>=3?frases[3]:frases[Math.min(r,2)];
+
+ var sp=siguientePremio(r);
+ document.getElementById('proximo').innerText = sp ? '🎁 Próximo premio en '+(sp-r)+(sp-r===1?' día':' días') : '🏆 Ya desbloqueaste todos los premios';
+
+ // consecuencia pendiente
+ var pe=document.getElementById('pendiente');
+ if(db.pendiente){ pe.innerHTML='<div class="banner"><b>Consecuencia pendiente:</b><br>'+esc(db.pendiente.texto)+'<button onclick="cumplida()">Ya la cumplí ✓</button></div>'; } else pe.innerHTML='';
+
+ // ánimo
+ var mo=document.getElementById('moods'); mo.innerHTML='';
+ EMOJIS.forEach(function(e,i){ var b=document.createElement('button'); b.innerText=e; if(db.animo[hoy]===i+1) b.className='sel'; b.onclick=function(){ setAnimo(i+1); }; mo.appendChild(b); });
+
+ // premios
+ var ph='';
+ HITOS.forEach(function(m){ var ok=r>=m; ph+='<div class="premio '+(ok?'ok':'lock')+'"><div class="d">'+(ok?'✓ ':'🔒 ')+m+'d</div><div>'+esc(db.premios[m]||PREMIOS_DEF[m]||'')+'</div></div>'; });
+ document.getElementById('premios').innerHTML=ph;
+
+ // calendario
+ var cal=document.getElementById('cal'); cal.innerHTML='';
+ for(var i=27;i>=0;i--){
+  var dd=new Date(); dd.setDate(dd.getDate()-i);
+  var k=key(dd), el=document.createElement('div'); el.innerText=dd.getDate();
+  if(db.checkins[k]) el.classList.add('chk');
+  if(k===hoy) el.classList.add('hoy');
+  var e=estado(k); if(e==='clean') el.classList.add('clean'); if(e==='fail') el.classList.add('fail');
+  cal.appendChild(el);
+ }
+
+ // detonantes
+ var dt=document.getElementById('detonantes');
+ if(db.recaidas.length>=2){
+  var c={}, noche=0;
+  db.recaidas.forEach(function(x){ c[x.det]=(c[x.det]||0)+1; if(x.h>=21||x.h<5) noche++; });
+  var top=Object.keys(c).sort(function(a,b){return c[b]-c[a]})[0];
+  dt.innerText='Tu detonante más común: '+top+' ('+c[top]+' de '+db.recaidas.length+' recaídas).'+(noche*2>=db.recaidas.length?' La mayoría ocurre de noche: deja el celular fuera de la cama.':'');
+ } else dt.innerText='';
+
+ // personalizar
+ setIf('edPremios', HITOS.map(function(m){return m+': '+(db.premios[m]||PREMIOS_DEF[m]||'')}).join('\n'));
+ setIf('edCons', db.consecuencias.join('\n'));
+ setIf('edMeta', db.metaPasos||6000);
+
+ renderPasos();
+ if(!(document.activeElement && document.activeElement.id==='edNac')) renderMadurez();
+ revisarPremios(r);
+}
+function setIf(id,v){ var e=document.getElementById(id); if(e && document.activeElement!==e) e.value=v; }
+
+/* ---------- Personalizar ---------- */
+function guardarPremios(){
+ var p={};
+ document.getElementById('edPremios').value.split('\n').forEach(function(l){ var m=l.match(/^\s*(\d+)\s*:\s*(.+)$/); if(m) p[+m[1]]=m[2].trim(); });
+ db.premios=merge({premios:p}).premios;
+ HITOS.forEach(function(h){ if(!db.premios[h]) db.premios[h]=PREMIOS_DEF[h]; });
+ save(); render(); alert('Premios guardados');
+}
+function guardarCons(){
+ var l=document.getElementById('edCons').value.split('\n').map(function(x){return x.trim()}).filter(Boolean);
+ db.consecuencias = l.length?l:CONS_DEF.slice();
+ save(); render(); alert('Consecuencias guardadas');
+}
+function guardarMeta(){
+ var v=parseInt(document.getElementById('edMeta').value,10);
+ if(v>=1000){ db.metaPasos=v; save(); render(); }
+}
+function borrar(){
+ if(!confirm('¿Borrar todo? Esto no se puede deshacer.')) return;
+ localStorage.removeItem('purezaDB');
+ db=merge({});
+ if(Native) Native.set({db:''}).catch(function(){});
+ render();
+}
+
+/* ---------- Sincronía con lo nativo (widget y pasos) ---------- */
+function acciones(){
+ if(!Native || !Native.consumeLaunch) return;
+ Native.consumeLaunch().then(function(r){ if(r && r.accion==='urge') abrirImpulso(); }).catch(function(){});
+}
+function pullNative(){
+ if(!Native){ render(); return; }
+ Native.get().then(function(res){
+  if(res && res.db){ try{ db=merge(JSON.parse(res.db)); localStorage.setItem('purezaDB',JSON.stringify(db)); }catch(e){} }
+  else if(localStorage.getItem('purezaDB')){ Native.set({db:localStorage.getItem('purezaDB')}).catch(function(){}); }
+  render(); pedirPasos(); acciones();
+ }).catch(render);
+}
+document.addEventListener('visibilitychange',function(){ if(!document.hidden) pullNative(); });
+window.addEventListener('focus',function(){ acciones(); });
+render(); pullNative();
+setInterval(function(){ if(!document.hidden && !document.getElementById('ov').classList.contains('on')) render(); },60000);
+</script>
+</body>
+</html>
